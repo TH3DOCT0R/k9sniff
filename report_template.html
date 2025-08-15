@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><title>K9Sniff Report</title>
+<style>
+ body{font-family:system-ui,Arial,sans-serif;margin:24px}
+ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;font-size:14px}
+ th{background:#f4f4f4;text-align:left}.sev-high{color:#b00020;font-weight:600}
+ .sev-med{color:#996300;font-weight:600}.sev-low{color:#005a9c;font-weight:600}
+ .meta{color:#444;margin:6px 0 16px}
+</style></head>
+<body>
+<h1>K9Sniff Report</h1>
+<div class="meta"><b>Target:</b> {{ target }} &nbsp; <b>Time:</b> {{ timestamp }}</div>
+
+<h2>Open Services (Nmap)</h2>
+<table><tr><th>Port</th><th>Proto</th><th>Service</th><th>Version</th></tr>
+{% for s in services %}
+<tr><td>{{s.port}}</td><td>{{s.proto}}</td><td>{{s.service}}</td><td>{{s.version}}</td></tr>
+{% endfor %}
+</table>
+
+<h2>Findings</h2>
+<table><tr><th>Tool</th><th>Title</th><th>Severity</th><th>Description</th></tr>
+{% for f in findings %}
+<tr><td>{{f.tool}}</td><td>{{f.title}}</td><td class="sev-{{f.severity_class}}">{{f.severity|upper}}</td><td>{{f.description}}</td></tr>
+{% endfor %}
+</table>
+</body></html>
