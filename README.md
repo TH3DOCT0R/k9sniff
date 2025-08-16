@@ -1,25 +1,51 @@
-````markdown
+```markdown
 # K9Sniff — Lightweight Web/API Triage Scanner
 
-**K9Sniff** quickly triages web/API targets for common issues:
-- HTTP(S) security headers, banner leakage, basic TLS reachability
-- Optional **Nmap** service scan (if installed)
-- Optional **Nuclei** run & JSONL ingestion (if installed)
+K9Sniff quickly triages web/API targets for common misconfigurations and produces **HTML**, **JSON**, and **JUnit** artifacts that you can use locally or in CI to gate pull requests.
 
-Outputs:
-- `reports/report.html` (human-readable)
-- `reports/summary.json` (machine-readable)
-- `reports/junit.xml` (CI gate)
+> Use only on systems you own or have explicit authorization to test.
 
-> Use only on authorized systems and training labs (e.g., Juice Shop/crAPI). Missing tools are skipped gracefully.
+---
+
+## Features
+
+- **HTTP triage**: security headers, banner exposure, basic TLS reachability.
+- **Optional tool hooks** (auto-skip if missing):
+  - **Nmap** — service discovery (`-sV` XML parsed).
+  - **Nuclei** — JSONL ingestion into findings.
+- **Reports**
+  - `reports/report.html` (human)
+  - `reports/summary.json` (machine)
+  - `reports/junit.xml` (CI gate; fails on High/Critical)
+- **Zero-crash philosophy**: missing tools/timeouts do not break the run.
+
+---
+
+## Directory
+
+<details>
+<summary><b>Show tree</b></summary>
+<pre>
+.
+├─ .github/workflows/        # Optional CI workflow(s)
+├─ examples/                 # Demo targets and fabricated sample outputs
+├─ k9sniff.py                # Entry point (CLI)
+├─ report_template.html      # HTML Jinja template
+├─ requirements.txt          # Minimal deps
+├─ README.md                 # This file
+└─ LICENSE
+</pre>
+</details>
 
 ---
 
 ## Requirements
+
 - Python **3.10+**
 - Optional: `nmap` and/or `nuclei` available on `PATH` for extra phases
 
-## Install
+Install:
+
 ```bash
 python -m venv .venv
 # Linux/macOS
@@ -28,16 +54,21 @@ source .venv/bin/activate
 # .venv\Scripts\Activate.ps1
 pip install --upgrade pip
 pip install -r requirements.txt
-````
+```
+
+---
 
 ## Quick Start
 
 ```bash
+# Single target
+python k9sniff.py --target https://example.com --out ./reports
+
 # Multiple targets (comma-separated)
-python k9sniff.py --targets https://example.com,https://juice.shop --out ./reports
+python k9sniff.py --targets https://one.com,https://two.com --out ./reports
 ```
 
-Enable optional phases (if installed):
+Enable optional phases (auto-skip if the tool isn’t installed):
 
 ```bash
 # With Nmap
@@ -46,34 +77,33 @@ python k9sniff.py --targets https://example.com --with-nmap
 # With Nuclei
 python k9sniff.py --targets https://example.com --with-nuclei
 
-# Both + custom timeout (seconds)
+# Both + custom timeout
 python k9sniff.py --targets https://example.com --with-nmap --with-nuclei --timeout 10 --out ./reports
 ```
 
 **Exit codes**
-
-* `0` — No High/Critical findings
-* `1` — ≥1 High/Critical finding (suitable to fail CI)
-
----
-
-## Command-Line Options
-
-```
---targets        Comma-separated URLs/hosts (required)
---out            Output directory (default: ./reports)
---with-nmap      Run Nmap service scan (if nmap is available)
---with-nuclei    Run Nuclei templates and ingest JSONL (if nuclei is available)
---timeout        HTTP timeout in seconds (default: 8.0)
-```
+- `0` — No High/Critical findings
+- `1` — ≥1 High/Critical finding (suitable to fail CI)
 
 ---
 
-## Artifacts
+## CLI Options
 
-* **HTML**: `reports/report.html` shows per-target findings, optional Nmap services, and (if enabled) raw Nuclei lines.
-* **JSON**: `reports/summary.json` includes summary + per-target details (findings, services, nuclei).
-* **JUnit**: `reports/junit.xml` marks the job failed if any High/Critical findings are present.
+```
+--targets / --target   Comma-separated URLs/hosts (required)
+--out                  Output directory (default: ./reports)
+--with-nmap            Run Nmap service scan (if available)
+--with-nuclei          Run Nuclei templates and ingest JSONL (if available)
+--timeout              HTTP timeout in seconds (default: 8.0)
+```
+
+---
+
+## Outputs
+
+- **HTML**: `reports/report.html` — per-target findings, optional Nmap services, optional raw Nuclei lines (collapsed).
+- **JSON**: `reports/summary.json` — summary + detailed per-target data (findings, services, nuclei).
+- **JUnit**: `reports/junit.xml` — marks the job failed if any High/Critical findings are present.
 
 ---
 
@@ -104,20 +134,26 @@ jobs:
 
 ---
 
-## Notes & Tips
+## Examples
 
-* You can pass plain hosts (e.g., `example.com`); they are normalized to `http://example.com`.
-* HTML is rendered from `report_template.html`. Customize styling or add evidence links if needed.
-* To attach screenshots/raw bodies, modify `k9sniff.py` to save files under `reports/evidence/` and add their paths to finding `evidence`.
+See `examples/`:
+- `targets.txt` — demo target list (labs).
+- `k9sniff_demo.sh` — drops fabricated sample artifacts into `./reports/`.
+- `sample_report.html`, `sample_summary.json`, `junit_example.xml` — visual/machine examples.
 
 ---
 
 ## Ethics
 
-Run K9Sniff only on systems you own or have explicit permission to test. It is a **triage** tool; validate findings before remediation.
+Use K9Sniff only on authorized systems and training labs (e.g., Juice Shop/crAPI). It’s a **triage** aid; validate before remediation.
 
 ---
 
+## License
+
+MIT (see `LICENSE`).
 ```
-::contentReference[oaicite:0]{index=0}
-```
+
+---
+
+
