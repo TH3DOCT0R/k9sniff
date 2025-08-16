@@ -1,28 +1,68 @@
 <!doctype html>
-<html><head>
-<meta charset="utf-8"><title>K9Sniff Report</title>
-<style>
- body{font-family:system-ui,Arial,sans-serif;margin:24px}
- table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;font-size:14px}
- th{background:#f4f4f4;text-align:left}.sev-high{color:#b00020;font-weight:600}
- .sev-med{color:#996300;font-weight:600}.sev-low{color:#005a9c;font-weight:600}
- .meta{color:#444;margin:6px 0 16px}
-</style></head>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>K9Sniff Report</title>
+  <style>
+    body { font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    h1,h2 { margin: 0.3em 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+    th { background: #f6f6f6; text-align: left; }
+    .muted { color:#777; }
+    .sev-info{color:#666}.sev-low{color:#2b7}.sev-med{color:#e7a11a}.sev-high{color:#d33}.sev-crit{color:#b00;font-weight:700}
+    code{background:#f2f2f2;padding:2px 4px;border-radius:4px}
+  </style>
+</head>
 <body>
-<h1>K9Sniff Report</h1>
-<div class="meta"><b>Target:</b> {{ target }} &nbsp; <b>Time:</b> {{ timestamp }}</div>
+<h1>K9Sniff — Report</h1>
+<p class="muted">
+  Generated {{ summary.generated_at }} • Targets: {{ summary.counts.targets }} • Findings: {{ summary.counts.findings_total }} • High/Critical: {{ summary.counts.high_or_critical }}
+</p>
 
-<h2>Open Services (Nmap)</h2>
-<table><tr><th>Port</th><th>Proto</th><th>Service</th><th>Version</th></tr>
-{% for s in services %}
-<tr><td>{{s.port}}</td><td>{{s.proto}}</td><td>{{s.service}}</td><td>{{s.version}}</td></tr>
-{% endfor %}
-</table>
+{% for r in results %}
+  <h2>Target: {{ r.target }}</h2>
 
-<h2>Findings</h2>
-<table><tr><th>Tool</th><th>Title</th><th>Severity</th><th>Description</th></tr>
-{% for f in findings %}
-<tr><td>{{f.tool}}</td><td>{{f.title}}</td><td class="sev-{{f.severity_class}}">{{f.severity|upper}}</td><td>{{f.description}}</td></tr>
+  {% if r.services and summary.tools.nmap_used %}
+  <h3>Detected Services (Nmap)</h3>
+  <table>
+    <tr><th>Port</th><th>Proto</th><th>State</th><th>Service</th><th>Product</th><th>Version</th></tr>
+    {% for s in r.services %}
+    <tr><td>{{ s.port }}</td><td>{{ s.proto }}</td><td>{{ s.state }}</td><td>{{ s.service }}</td><td>{{ s.product }}</td><td>{{ s.version }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  <h3>Findings</h3>
+  <table>
+    <tr><th>ID</th><th>Title</th><th>Severity</th><th>CVSS</th><th>Description</th><th>Remediation</th><th>Evidence</th></tr>
+    {% for f in r.findings %}
+      {% set sev=f.severity %}
+      <tr>
+        <td><code>{{ f.id }}</code></td>
+        <td>{{ f.title }}</td>
+        <td class="sev-{{ 'crit' if sev=='critical' else ('high' if sev=='high' else ('med' if sev=='medium' else ('low' if sev=='low' else 'info'))) }}">{{ f.severity }}</td>
+        <td>{{ '%.1f' % f.cvss }}</td>
+        <td>{{ f.description }}</td>
+        <td>{{ f.remediation }}</td>
+        <td>
+          <ul>
+            {% for e in f.evidence %}
+              <li><b>{{ e.key }}</b>: {{ e.value }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  {% if r.nuclei and summary.tools.nuclei_used %}
+  <details><summary><b>Nuclei raw ({{ r.nuclei|length }} lines)</b></summary>
+    <pre>{{ r.nuclei | tojson(indent=2) }}</pre>
+  </details>
+  {% endif %}
 {% endfor %}
-</table>
-</body></html>
+
+<p class="muted">Use only on authorized systems. K9Sniff is for triage; validate before remediation.</p>
+</body>
+</html>
