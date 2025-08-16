@@ -1,0 +1,20 @@
+name: K9Sniff (Examples)
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          # Example: safe labs only (adjust as needed)
+          python k9sniff.py --targets https://juice.shop,https://httpbin.org --out ./reports
+      - uses: actions/upload-artifact@v4
+        with:
+          name: k9sniff-reports
+          path: reports/
