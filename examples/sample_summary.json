@@ -1,0 +1,78 @@
+{
+  "summary": {
+    "generated_at": "2025-08-16T10:15:00Z",
+    "targets": [
+      "https://juice.shop",
+      "https://httpbin.org"
+    ],
+    "counts": {
+      "targets": 2,
+      "findings_total": 6,
+      "high_or_critical": 1
+    },
+    "tools": {
+      "nmap_used": true,
+      "nuclei_used": true
+    }
+  },
+  "results": [
+    {
+      "target": "https://juice.shop",
+      "findings": [
+        {
+          "id": "K9-10021",
+          "title": "Missing security header: content-security-policy",
+          "severity": "high",
+          "cvss": 7.5,
+          "description": "The response does not include 'content-security-policy' (Define CSP to mitigate XSS/injection).",
+          "remediation": "Add appropriate 'content-security-policy' header per best practices.",
+          "evidence": [
+            { "key": "status_code", "value": 200 },
+            { "key": "observed_headers", "value": ["date", "server", "content-type"] }
+          ]
+        },
+        {
+          "id": "K9-32455",
+          "title": "Server banner exposed",
+          "severity": "low",
+          "cvss": 3.1,
+          "description": "The 'Server' header reveals server software/version.",
+          "remediation": "Remove/minimize the banner or use a generic value.",
+          "evidence": [{ "key": "server", "value": "nginx/1.25.4" }]
+        }
+      ],
+      "services": [
+        { "port": "80", "proto": "tcp", "state": "open", "service": "http", "product": "nginx", "version": "1.25" },
+        { "port": "443", "proto": "tcp", "state": "open", "service": "https", "product": "nginx", "version": "1.25" }
+      ],
+      "nuclei": [
+        { "template-id": "example-header-missing", "info": { "name": "Header Missing", "severity": "medium" } }
+      ]
+    },
+    {
+      "target": "https://httpbin.org",
+      "findings": [
+        {
+          "id": "K9-43311",
+          "title": "Missing security header: permissions-policy",
+          "severity": "medium",
+          "cvss": 6.0,
+          "description": "The response does not include 'permissions-policy' (Limit powerful features).",
+          "remediation": "Add 'permissions-policy' to restrict features.",
+          "evidence": [{ "key": "status_code", "value": 200 }]
+        },
+        {
+          "id": "K9-43312",
+          "title": "Missing security header: referrer-policy",
+          "severity": "medium",
+          "cvss": 6.0,
+          "description": "The response does not include 'referrer-policy' (Limit referer leakage).",
+          "remediation": "Add 'referrer-policy' per best practices.",
+          "evidence": [{ "key": "status_code", "value": 200 }]
+        }
+      ],
+      "services": [],
+      "nuclei": []
+    }
+  ]
+}
