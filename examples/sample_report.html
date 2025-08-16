@@ -1,1 +1,157 @@
-<!doctype html><html><body><h1>K9Sniff Sample Report</h1><p>Generated on an environment without nmap/nuclei. Replace with real scan.</p></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>K9Sniff — Sample Report (Fabricated)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#11172b; --ink:#e8eefc; --muted:#9fb0d6;
+      --ok:#00d68f; --warn:#f0ad4e; --bad:#ff5a6e; --crit:#e00043; --low:#25c2a0; --info:#8aa4cf;
+      --line:#1d2643; --chip:#1a2140; --code:#0f1530;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1020 0%,#121a33 100%);color:var(--ink);font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
+    header{padding:24px 24px 0}
+    .title{font-size:28px;font-weight:800;letter-spacing:.3px}
+    .subtitle{color:var(--muted);margin-top:6px}
+    main{padding:24px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column: span 12;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    @media (min-width: 980px){
+      .span-4{grid-column: span 4}
+      .span-8{grid-column: span 8}
+      .span-12{grid-column: span 12}
+    }
+    .card h2{margin:0;padding:14px 16px;border-bottom:1px solid var(--line);font-size:16px}
+    .meta{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;color:var(--muted)}
+    .chip{display:inline-block;background:var(--chip);border:1px solid var(--line);color:var(--ink);padding:4px 10px;border-radius:999px;font-size:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{color:#c8d4ff;text-align:left;background:#131a33}
+    .sev{font-weight:700}
+    .sev.info{color:var(--info)}
+    .sev.low{color:var(--low)}
+    .sev.medium{color:var(--warn)}
+    .sev.high{color:var(--bad)}
+    .sev.critical{color:var(--crit)}
+    code, pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:2px 6px}
+    pre{padding:10px;overflow:auto;max-height:320px}
+    details summary{cursor:pointer;font-weight:600}
+    footer{padding:24px;color:var(--muted);text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">K9Sniff — Sample Report</div>
+    <div class="subtitle">Generated 2025-08-16T10:15:00Z • Targets: 2 • Findings: 6 • High/Critical: 1</div>
+    <div class="meta">
+      <span class="chip">Nmap: enabled</span>
+      <span class="chip">Nuclei: enabled</span>
+      <span class="chip">Mode: triage</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card span-12">
+      <h2>Target • https://juice.shop</h2>
+      <div class="grid" style="padding:10px 14px">
+        <div class="card span-4" style="background:#0f1530">
+          <h2>Services (Nmap)</h2>
+          <table>
+            <tr><th>Port</th><th>Proto</th><th>State</th><th>Service</th></tr>
+            <tr><td>80</td><td>tcp</td><td>open</td><td>http (nginx 1.25)</td></tr>
+            <tr><td>443</td><td>tcp</td><td>open</td><td>https (nginx 1.25)</td></tr>
+          </table>
+        </div>
+        <div class="card span-8" style="background:#0f1530">
+          <h2>Findings</h2>
+          <table>
+            <tr><th>ID</th><th>Title</th><th>Severity</th><th>CVSS</th><th>Description / Remediation</th></tr>
+            <tr>
+              <td><code>K9-10021</code></td>
+              <td>Missing security header: content-security-policy</td>
+              <td class="sev high">high</td>
+              <td>7.5</td>
+              <td>
+                The response does not include <code>content-security-policy</code> (Define CSP to mitigate XSS/injection).<br>
+                <b>Fix:</b> Add a strict CSP (default-src 'self'; script-src 'self' ...).
+                <details><summary>Evidence</summary>
+                  <pre>{
+  "status_code": 200,
+  "observed_headers": ["date","server","content-type"]
+}</pre>
+                </details>
+              </td>
+            </tr>
+            <tr>
+              <td><code>K9-32455</code></td>
+              <td>Server banner exposed</td>
+              <td class="sev low">low</td>
+              <td>3.1</td>
+              <td>
+                The <code>Server</code> header reveals software/version.
+                <b>Fix:</b> Remove/minimize the banner or use a generic value.
+                <details><summary>Evidence</summary>
+                  <pre>{ "server": "nginx/1.25.4" }</pre>
+                </details>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="padding:10px 14px">
+        <details>
+          <summary><b>Nuclei raw (1 line)</b></summary>
+          <pre>[
+  {
+    "template-id": "example-header-missing",
+    "info": { "name": "Header Missing", "severity": "medium" }
+  }
+]</pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="card span-12">
+      <h2>Target • https://httpbin.org</h2>
+      <div style="padding:10px 14px">
+        <table>
+          <tr><th>ID</th><th>Title</th><th>Severity</th><th>CVSS</th><th>Description / Remediation</th></tr>
+          <tr>
+            <td><code>K9-43311</code></td>
+            <td>Missing security header: permissions-policy</td>
+            <td class="sev medium">medium</td>
+            <td>6.0</td>
+            <td>
+              The response does not include <code>permissions-policy</code> (Limit powerful features).<br>
+              <b>Fix:</b> Add a conservative Permissions-Policy header.
+              <details><summary>Evidence</summary>
+                <pre>{ "status_code": 200 }</pre>
+              </details>
+            </td>
+          </tr>
+          <tr>
+            <td><code>K9-43312</code></td>
+            <td>Missing security header: referrer-policy</td>
+            <td class="sev medium">medium</td>
+            <td>6.0</td>
+            <td>
+              The response does not include <code>referrer-policy</code> (Limit referer leakage).<br>
+              <b>Fix:</b> Add <code>referrer-policy: no-referrer</code> or suitable alternative.
+              <details><summary>Evidence</summary>
+                <pre>{ "status_code": 200 }</pre>
+              </details>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Use only on authorized systems. This sample is fabricated for demonstration.
+  </footer>
+</body>
+</html>
